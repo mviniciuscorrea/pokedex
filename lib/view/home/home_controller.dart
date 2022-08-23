@@ -69,7 +69,8 @@ class HomeController extends ChangeNotifier {
       }
     } else {
       _service
-          .pokemonSimpleInfo(idNamePokemon: _ctrlInputIdName.text)
+          .pokemonSimpleInfo(
+              idNamePokemon: _ctrlInputIdName.text.trim().toLowerCase())
           .then((resp) {
         if (resp.statusCode == 200) {
           pokemonsList.add(

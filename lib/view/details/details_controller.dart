@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pokedex/helper.dart';
 import 'package:pokedex/model/pokemon_details.dart';
 import 'package:pokedex/services/pokedex_service.dart';
@@ -8,7 +8,6 @@ import 'package:pokedex/styles/style.dart';
 import 'package:pokedex/widget/alertdlg.dart';
 import 'package:pokedex/widget/chipstype.dart';
 import 'package:pokedex/widget/textinfo.dart';
-import '../../controller/routes.dart';
 
 class DetailsController extends ChangeNotifier {
   final _style = Styles();
@@ -32,7 +31,7 @@ class DetailsController extends ChangeNotifier {
   }
 
   void _returnHome() {
-    Navigator.pushNamed(_context, Routes.routeHome);
+    Navigator.pop(_context);
   }
 
   void _getDetails({required int idPokemon}) {
@@ -101,17 +100,26 @@ class DetailsController extends ChangeNotifier {
                 ),
               ],
             ),
-            child: Hero(
-              tag: details.name,
-              child: CachedNetworkImage(
-                placeholder: (context, url) =>
-                    const CircularProgressIndicator(),
-                imageUrl:
-                    'https://assets.pokemon.com/assets/cms2/img/pokedex/detail/${details.id.toString().padLeft(3, '0')}.png',
-                height: 150,
-                width: 150,
-                fit: BoxFit.contain,
-              ),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: 1.0),
+              curve: Curves.ease,
+              duration: const Duration(seconds: 4),
+              builder: (BuildContext context, double opacity, Widget? child) {
+                return Opacity(
+                  opacity: opacity,
+                  child: SvgPicture.network(
+                    height: 150,
+                    width: 150,
+                    details.sprites.other.dreamWorld.frontDefault,
+                    placeholderBuilder: (BuildContext context) => Padding(
+                      padding: const EdgeInsets.all(40.0),
+                      child: CircularProgressIndicator(
+                        color: _styleColors.background,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -154,6 +162,11 @@ class DetailsController extends ChangeNotifier {
             padding: const EdgeInsets.only(left: 8, top: 12),
             child: Column(
               children: [
+                TextInfo(
+                  title: 'Xp: ',
+                  value: details.baseExperience.toString(),
+                ),
+                const SizedBox(height: 5),
                 TextInfo(
                   title: 'Altura: ',
                   value:
